@@ -1,10 +1,11 @@
 import logging
 import random
 
+import allure
 import pytest
 from mimesis import Person, Locale
-from selene import browser
 from selenium import webdriver
+from selene import browser
 from webdriver_manager.chrome import ChromeDriverManager
 
 from page import CartPage
@@ -13,6 +14,8 @@ from utils.base.BaseTest import do
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger()
+prev_test_screenshot = None
+prev_test_page_source = None
 
 
 @pytest.fixture(scope="class")
@@ -22,8 +25,8 @@ def driver_init(request):
         desired_capabilities={'browserName': 'htmlunit',
                               'version': '2',
                               'javascriptEnabled': True})
-    browser.set_driver(driver)
-    browser.set_driver(webdriver.Chrome(ChromeDriverManager().install()))
+    browser.config.driver = driver
+    browser.config.driver = (webdriver.Chrome(ChromeDriverManager().install()))
     yield
     browser.quit()
 
@@ -68,3 +71,12 @@ def clearCart():
     yield
     do.open(CartPage.getHref())
     do.step(CartPage.clearCart(), "очистка корзины")
+
+
+def pytest_exception_interact():
+    with allure.step('Screenshot'):
+        last_screenshot = browser.config.last_screenshot
+        allure.attach.file(
+            source=last_screenshot,
+            attachment_type=allure.attachment_type.PNG
+        )

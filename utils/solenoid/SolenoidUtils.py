@@ -1,27 +1,24 @@
 from selene import browser
 from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver
-
-from utils.Utils import getWebBrowser
 
 
-class Solenoid(object):
-    __webDriver: WebDriver = None
+class SolenoidUtils:
+    __webDriver: webdriver = None
 
-    @staticmethod
-    def getWebDriver():
-        return Solenoid.__webDriver
+    @classmethod
+    def getWebDriver(cls):
+        return cls.__webDriver
 
-    @staticmethod
-    def openSingelton(site: str):
-        if Solenoid.__webDriver is None:
+    @classmethod
+    def openSingelton(cls, site: str):
+        if cls.__webDriver is None:
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument("--disable-notifications")
             chrome_options.add_argument("--enable-automation")
             chrome_options.add_argument("--start-maximized")
             chrome_options.add_argument('--ignore-ssl-errors=yes')
             chrome_options.add_argument('--ignore-certificate-errors')
-            chrome_options.browser_version = '100.0'
+            chrome_options.browser_version = '118.0'
             chrome_options.set_capability(
                 'selenoid:options',
                 {
@@ -35,14 +32,14 @@ class Solenoid(object):
                 command_executor='http://localhost:4444/wd/hub',
                 options=chrome_options
             )
-            Solenoid.__webDriver = driver
-            browser.set_driver(driver)
-        browser.open_url(site)
+            cls.__webDriver = driver
+            browser.config.driver = driver
+        browser.open(site)
 
-    @staticmethod
-    def teardown_module():
+    @classmethod
+    def teardown_module(cls):
         browser.quit()
 
-    @staticmethod
-    def open(site: str):
-        Solenoid.openSingelton(site)
+    @classmethod
+    def open(cls, site: str):
+        cls.openSingelton(site)

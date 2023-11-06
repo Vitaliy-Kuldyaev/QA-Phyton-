@@ -1,9 +1,8 @@
 import logging
-
-from selene.conditions import visible
+from selene import have, query
 from selene.support import by
-from selene.support.jquery_style_selectors import s
-
+from selene.support.conditions.be import visible
+from selene.support.shared.jquery_style import s
 from page import ProductPage, CartPage
 from utils.base.BaseTest import do
 
@@ -20,9 +19,9 @@ LOG = logging.getLogger()
 
 def checkHeaderNameIs(estHeaderName: str):
     try:
-        nameHeader.assure(visible, timeout=5)
-        LOG.info("Header Name = : " + nameHeader.text)
-        if nameHeader.text == estHeaderName:
+        nameHeader.with_(timeout=5).should(visible)
+        LOG.info("Header Name = : " + nameHeader.get(query.text))
+        if nameHeader.get(query.text) == estHeaderName:
             return True
         else:
             return False
@@ -38,7 +37,7 @@ def addProductsToCart(listProducts: list):
 
 
 def checkProductNumberInCart(estListProduct):
-    if numberProductsInCart.should_be(visible, 10).text == str(len(estListProduct)):
+    if numberProductsInCart.get(query.text) == str(len(estListProduct)):
         return True
 
 

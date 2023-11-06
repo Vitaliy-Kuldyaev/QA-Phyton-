@@ -1,8 +1,8 @@
 import logging
 
-from selene import browser
+from selene import browser, query
 from selene.support import by
-from selene.support.jquery_style_selectors import s, ss
+from selene.support.shared.jquery_style import s, ss
 
 from utils.globalVariable import defaultAddress
 
@@ -22,8 +22,8 @@ def checkProductPresentInChar(estListProduct):
     result: bool = False
     actText = []
     try:
-        for i in range(__nameProducts.size()):
-            actText.append(__nameProducts[i].text)
+        for i in range(__nameProducts.get(query.size)):
+            actText.append(__nameProducts[i].get(query.text))
         result = set(actText) == set(estListProduct)
     except BaseException:
         pass
@@ -33,7 +33,8 @@ def checkProductPresentInChar(estListProduct):
 
 
 def clearCart():
-    numberProductToDelete = __removeBtn.size()
-    for i in range(numberProductToDelete):
+    while __removeBtn.get(query.size) > 0:
         __removeBtn[0].click()
-        browser.driver().refresh()
+    # for i in range(__removeBtn.get(query.size)):
+    #     __removeBtn[i].click()
+    #     browser.driver.refresh()

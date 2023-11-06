@@ -1,5 +1,5 @@
 from selene.support import by
-from selene.support.jquery_style_selectors import s, ss
+from selene.support.shared.jquery_style import s
 
 from utils.base.BaseTest import do
 

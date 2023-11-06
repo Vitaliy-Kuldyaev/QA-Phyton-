@@ -1,11 +1,11 @@
 import allure
-from selene.elements import SeleneElement
+from selene import Element
 from selene.support.conditions import be
 
 from page import LoginPage
 from utils.Utils import *
 from utils.enums.UsersCredentials import UsersCredentials
-from utils.solenoid.Solenoid import Solenoid
+from utils.solenoid.SolenoidUtils import SolenoidUtils
 from utils.steps import StepBase
 
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +15,7 @@ LOG = logging.getLogger()
 class doClass(object):
     @allure.step("Открыть сайт: {site}, логин: {loginData}")
     def open(self, site: str, loginData: {} = None, user: UsersCredentials = None):
-        Solenoid.open(site)
+        SolenoidUtils.open(site)
         self.headerLog()
         LOG.info("------- Открытие страницы: " + site)
         if loginData is not None:
@@ -31,18 +31,18 @@ class doClass(object):
         self.footerLog()
 
     @allure.step("Заполнить элемент: {message}")
-    def send(self, el: SeleneElement, value: str, message: str):
+    def send(self, el: Element, value: str, message: str):
         self.headerLog()
-        LOG.info("------- Отправить значение: " + value + "  в элемент: " + el.tag_name + "  Описание: " + message)
+        LOG.info("------- Отправить значение: " + value + "  в элемент: " + el().tag_name + "  Описание: " + message)
         for i in range(5):
             LOG.info("--- проверка на наличие элемента")
-            el.should(be.visible).should_be(be.enabled)
-            el.clear()
+            el.with_(timeout=10).should(be.visible and be.enabled)
+            el().clear()
             LOG.info("--- установка значения: " + value)
             el.set(value)
-            LOG.info("--- --- Act text: " + el.text)
-            LOG.info("--- --- Act value: " + el.get_attribute('value'))
-            if el.text == value or el.get_attribute('value') == value:
+            LOG.info("--- --- Act text: " + el().text)
+            LOG.info("--- --- Act value: " + el().get_attribute('value'))
+            if el().text == value or el().get_attribute('value') == value:
                 logging.info("--- Значение установлено")
                 break
             else:
@@ -61,10 +61,10 @@ class doClass(object):
         LOG.info("____________________________________")
 
     @allure.step("Нажатие на элемент: {message}")
-    def click(self, el: SeleneElement, message: str):
+    def click(self, el: selene.Element, message: str):
         self.headerLog()
         LOG.info("------- Нажатие: " + message)
-        el.should_be(be.visible, 10).click()
+        el.with_(timeout=10).should(be.visible).click()
         self.footerLog()
         return self
 
